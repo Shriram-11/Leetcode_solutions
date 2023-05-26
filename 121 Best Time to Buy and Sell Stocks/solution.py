@@ -22,6 +22,3 @@ def best(prices):
         # if the current prices is less than last purchase prices we purchase on the current date
         purchase = min(purchase, prices[i])
     return profit
-
-
-print(len(str(len(str(len("Python"))))))
