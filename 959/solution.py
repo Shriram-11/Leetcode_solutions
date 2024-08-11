@@ -1,0 +1,52 @@
+def regionsBySlashes(grid):
+    """
+    :type grid: List[str]
+    :rtype: int
+    """
+    n = len(grid)
+    size = 4 * n * n
+    uf = UnionFind(size)
+    
+    for i in range(n):
+        for j in range(n):
+            index = 4 * (i * n + j)
+            if grid[i][j] == '/':
+                uf.union(index, index + 3)
+                uf.union(index + 1, index + 2)
+            elif grid[i][j] == '\\':
+                uf.union(index, index + 1)
+                uf.union(index + 2, index + 3)
+            else:  # Blank space, all triangles are connected
+                uf.union(index, index + 1)
+                uf.union(index + 1, index + 2)
+                uf.union(index + 2, index + 3)
+            
+            # Union with adjacent cells
+            if i > 0:  # Union with the cell above
+                uf.union(index, 4 * ((i - 1) * n + j) + 2)
+            if j > 0:  # Union with the cell to the left
+                uf.union(index + 3, 4 * (i * n + (j - 1)) + 1)
+    
+    return sum(uf.find(x) == x for x in range(size))
+
+class UnionFind:
+    def __init__(self, size):
+        self.parent = list(range(size))
+        self.rank = [1] * size
+
+    def find(self, x):
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
+
+    def union(self, x, y):
+        rootX = self.find(x)
+        rootY = self.find(y)
+        if rootX != rootY:
+            if self.rank[rootX] > self.rank[rootY]:
+                self.parent[rootY] = rootX
+            elif self.rank[rootX] < self.rank[rootY]:
+                self.parent[rootX] = rootY
+            else:
+                self.parent[rootY] = rootX
+                self.rank[rootX] += 1
